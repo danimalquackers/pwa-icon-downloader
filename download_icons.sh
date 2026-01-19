@@ -20,6 +20,7 @@ SAFE_NAME="${DOMAIN//[^a-zA-Z0-9.-]/_}"
 ICON_FILE="$ICON_DIR/$SAFE_NAME.ico"
 
 # Helper: Verify if the downloaded file is a valid image with non-zero size
+# shellcheck disable=SC2329
 is_valid_image() {
   local file="$1"
   [[ -s "$file" ]] || return 1
@@ -29,19 +30,24 @@ is_valid_image() {
 }
 
 # Helper: Resolve relative or absolute URLs against a base URL
+# shellcheck disable=SC2329
 resolve_url() {
   local url="$1"
   local base="$2"
+
   # If URL starts with http, it's already absolute
   [[ "$url" == http* ]] && { echo "$url"; return; }
+
   # If URL starts with /, it's relative to the domain root
   [[ "$url" == /* ]] && { echo "${base%/}${url}"; return; }
+
   # Otherwise, it's relative to the current path
   echo "${base%/}/${url}"
 }
 
 # Method 1: Extraction from PWA Manifest
 # Scans HTML for rel="manifest" and parses the JSON for icon sources.
+# shellcheck disable=SC2329
 fetch_pwa_manifest() {
   local domain="$1" base_url="$2" target="$3" html_file="$4"
   
@@ -60,9 +66,11 @@ fetch_pwa_manifest() {
   # Resolve the manifest URL (could be relative to the base URL)
   local manifest_url
   manifest_url=$(resolve_url "$manifest_href" "$base_url")
+
+  # Create a temporary manifest file
   local tmp_manifest
   tmp_manifest=$(mktemp)
-  
+
   # Download the manifest JSON file
   if curl -sL "$manifest_url" -o "$tmp_manifest"; then
     # Extract all "src" values from the manifest using regex.
@@ -92,6 +100,7 @@ fetch_pwa_manifest() {
 
 # Method 2: Extraction from HTML <link> tags
 # Scans for shortcut icons, apple-touch-icons, etc.
+# shellcheck disable=SC2329
 fetch_html_icon() {
   local domain="$1" base_url="$2" target="$3" html_file="$4"
   
@@ -118,6 +127,7 @@ fetch_html_icon() {
 }
 
 # Method 3: Direct download from /favicon.ico
+# shellcheck disable=SC2329
 fetch_direct_favicon() {
   local domain="$1" base_url="$2" target="$3"
   
@@ -130,6 +140,7 @@ fetch_direct_favicon() {
 
 # Method 4: Fallback to Google S2 Favicon service
 # This is a reliable fallback that uses Google's cache if local checks fail.
+# shellcheck disable=SC2329
 fetch_google_s2() {
   local domain="$1" base_url="$2" target="$3"
   
@@ -142,8 +153,6 @@ fetch_google_s2() {
   fi
   return 1
 }
-
-# --- Execution Setup ---
 
 # Download the main page HTML once to be used by scrapers
 TMP_HTML=$(mktemp)

@@ -88,7 +88,7 @@
       };
 
       # Provide an overlay to add it to pkgs
-      overlays.default = final: prev: {
+      overlays.pwa-icon-downloader = final: prev: {
         downloadWebAppIcon = mkDownloadWebAppIcon final;
       };
 
@@ -109,7 +109,7 @@
         }
       );
 
-      homeManagerModules.default =
+      homeManagerModules.pwa-icon-downloader =
         { pkgs, ... }:
         {
           # Inject the helper into module arguments

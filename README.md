@@ -30,14 +30,14 @@ inputs.pwa-icon-downloader.url = "github:danimalquackers/pwa-icon-downloader";
 Import the module and use the `downloadWebAppIcon` helper in your desktop items:
 
 ```nix
-{ pkgs, downloadWebAppIcon, ... }: {
+{ pkgs, pwa-icon-downloader, ... }: {
   imports = [ pwa-icon-downloader.homeManagerModules.default ];
 
   home.packages = [
     (pkgs.makeDesktopItem {
       name = "YouTube Music";
       exec = "firefox ...";
-      icon = downloadWebAppIcon {
+      icon = pwa-icon-downloader.downloadWebAppIcon {
         domain = "music.youtube.com";
         hash = lib.fakeHash; # Nix will provide the correct hash on first run
       };
